@@ -94,7 +94,7 @@ module Sensu::Extension
         tp.each do |p, points|
           logger.debug("Sending #{ points.length } points to #{ db } InfluxDB database with precision=#{ p }")
 
-          EventMachine::HttpRequest.new("#{ @influx_conf['protocol'] }://#{ @influx_conf['host'] }:#{ @influx_conf['port'] }/write?db=#{ db }&precision=#{ p }&u=#{ @influx_conf['username'] }&p=#{ @influx_conf['password'] }").post :body => points.join("\n")
+          EventMachine::HttpRequest.new("#{ @influx_conf['protocol'] }://#{ @influx_conf['host'] }:#{ @influx_conf['port'] }/write?db=#{ db }&precision=#{ p }&u=#{ @influx_conf['user'] || @influx_conf['username'] }&p=#{ @influx_conf['password'] }").post :body => points.join("\n")
 
         end
         logger.debug("Cleaning buffer for db #{ db }")
@@ -130,7 +130,7 @@ module Sensu::Extension
 
         # default values
         settings['tags'] ||= {}
-        settings['use_ssl'] ||= false
+        settings['use_ssl'] ||= settings['ssl_enable'] || false
         settings['time_precision'] ||= 's'
         settings['protocol'] = settings['use_ssl'] ? 'https' : 'http'
         settings['buffer_max_size'] ||= 500
